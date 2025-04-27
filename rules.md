@@ -9,7 +9,7 @@
 ## Code and Script Conventions
 
 - Favor minimal, explicit scripts.
-- Shell scripts must handle failures (`set -e`) unless justified otherwise.
+- Shell scripts must handle failures (`set -e -u -o pipefail`) unless justified otherwise.
 - Hooks must be idempotent and non-intrusive.
 
 ## Review and Merging
