@@ -14,9 +14,8 @@ Minimal reusable setup scripts and planning templates for clean, safe project in
 - [Included](#included)
   - [Git Hooks Setup](#git-hooks-setup)
   - [Templates](#templates)
+- [Protecting the Main Branch](#protecting-the-main-branch)
 - [Usage](#usage)
-  - [Use Git Hooks (automated)](#1-use-git-hooks-automated)
-  - [Create Project Planning Template](#2-create-project-planning-template)
 - [Directory Structure](#directory-structure)
 - [License](#license)
 - [Philosophy](#philosophy)
@@ -35,16 +34,11 @@ It is designed for speed, minimalism, and serious development hygiene.
 
 ### Git Hooks Setup
 
-Hooks are automatically installed to prevent direct commits to `main` branch and provide basic checks.
+Hooks are automatically installed to prevent direct commits to `main` or `master` branches.
 
-#### Bypassing Hooks
-
-If you need to bypass hooks manually (e.g., emergency commits, migrations), you can use:
-
-```bash
-git commit --no-verify
-git push --no-verify
-```
+- Local pre-commit hooks ensure protection.
+- Lightweight, Git-native solution.
+- No external dependencies like Husky.
 
 ---
 
@@ -53,55 +47,69 @@ git push --no-verify
 - **Planning Template**  
   Provides a consistent, minimal structure for defining project goals and tasks (`templates/planning-template.md`).
 
-- **Other Files**  
-  Flexible and manually written as the project evolves:
+- **Other Templates**  
+  Additional templates like:
   - **rules.md**: Guidelines or best practices for the project.
-  - **philosophy.md**: The overarching principles or vision for the project.
-  - **ideas.md**: Brainstorming or feature ideas for future development.
+  - **philosophy.md**: The overarching principles or vision.
+  - **ideas.md**: Brainstorming feature ideas.
 
-Templates should exist only where structure adds real value, following the philosophy of minimalism and flexibility.
+Templates are minimal, and only exist where they add real value.
+
+---
+
+## Protecting the Main Branch
+
+### Problem
+
+Accidental direct commits to the `main` (or `master`) branch can cause instability, broken production, or bypass code review processes.
+
+To maintain project safety and clean workflows, direct commits to protected branches must be blocked **locally** at the commit level.
+
+### Solution
+
+We implement a minimal pre-commit hook that:
+
+- Checks the current Git branch during every commit.
+- Blocks the commit if the branch is `main` or `master`.
+- Displays a clear error message.
+- Allows commits to all other branches.
+
+This local protection is:
+
+- Lightweight
+- Git-native (no external libraries)
+- Quick to set up manually or automatically
+
+> Bypassing the hook (only when absolutely necessary) can be done using:
+
+```bash
+git commit --no-verify
+git push --no-verify
+```
 
 ---
 
 ## Usage
 
-To quickly initialize local git safety and planning:
+### Install Git Hooks Manually
 
-### 1. Use Git Hooks (automated)
-
-To set up Git hooks, follow these steps:
-
-1. Create a `git/hooks` directory in your repository.
-2. Add your custom hooks (e.g., `pre-commit`, `pre-push`) to this directory.
-3. Make the hooks executable using:
+1. Create a `templates/` directory if not already present.
+2. Place your custom hooks (e.g., `pre-commit`) into `templates/`.
+3. Run the setup script:
 
 ```bash
-chmod +x git/hooks/*
-```
-
-1. Configure Git to use the hooks:
-
-```bash
-git config core.hooksPath git/hooks
-```
-
-Alternatively, you can use the following script for automated setup:
-
-```bash
-npx github:dmitriz/setup-scripts husky-setup.sh
+bash install-git-hooks.sh
 ```
 
 This script will:
 
-- Install Husky if missing
-- Set up pre-commit enforcement
-- Verify the setup automatically by testing a failing commit
+- Copy hook templates into `.git/hooks/`
+- Make hooks executable
+- Activate hooks immediately
 
-✅ No manual setup needed.
+✅ No external libraries needed.
 
----
-
-### 2. Create Project Planning Template
+### Create Project Planning Template
 
 ```bash
 cp templates/planning-template.md planning.md
@@ -119,8 +127,8 @@ setup-scripts/
 ├── planning.md
 ├── templates/
 │   ├── planning-template.md
-│   └── README.md
-├── hook-setup.sh
+│   └── pre-commit
+├── install-git-hooks.sh
 ├── .gitignore
 ├── README.md
 ├── package.json
@@ -140,15 +148,3 @@ This project is licensed under the [MIT License](LICENSE).
 - **Automation Preferred**: Eliminate manual repetitive tasks.
 - **Flexibility**: Provide building blocks, not rigid systems.
 - **Safety by Default**: Protect projects early from mistakes.
-
----
-
-## State-of-the-Art Git Ignore File
-
-This repository includes a state-of-the-art `.gitignore` file designed for reusability across projects. It ensures:
-
-- Comprehensive coverage of common file types and patterns.
-- Minimal manual adjustments needed for most setups.
-- Improved project hygiene by excluding unnecessary files from version control.
-
-Feel free to reuse and adapt it for your own projects.
