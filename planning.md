@@ -43,7 +43,7 @@
 
 - [ ] Add a `prepare` script into `package.json`.
 - [ ] (Optional) Create a `Makefile` for hook installation.
-- [ ] Add clear bypass instructions in `README.md` (`--no-verify`).
+- [ ] Add clear bypass instructions in `README.md` (`--no-verify`) with security warnings and proper use cases.
 
 ### Phase 4: Repository Clean State Validation
 
