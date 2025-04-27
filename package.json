@@ -1,0 +1,18 @@
+{
+  "name": "setup-scripts",
+  "version": "1.0.0",
+  "description": "Minimal reusable setup scripts and planning templates for clean, safe project initialization.",
+  "scripts": {
+    "setup-hooks": "bash husky-setup.sh",
+    "test": "echo 'Test always passes'"
+  },
+  "keywords": [
+    "setup",
+    "scripts",
+    "husky",
+    "git-hooks",
+    "minimalist"
+  ],
+  "author": "dmitriz",
+  "license": "MIT"
+}

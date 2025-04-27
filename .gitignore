@@ -1,0 +1,68 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.*
+.envrc
+
+# Credentials and secrets
+creds/
+credentials/
+secrets/
+
+# npm config and logs
+.npmrc
+npm-debug.log*
+
+# Yarn config and logs
+.yarnrc
+.yarnrc.yml
+yarn-debug.log*
+
+# pnpm config and logs
+.pnpmfile.cjs
+pnpm-debug.log*
+
+# OS system files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.bak
+*.old
+
+# Git conflict files
+*.orig
+
+# Husky system internal files
+.husky/_/
+
+# Test coverage (future-proof)
+coverage/
+
+# Linter cache
+.eslintcache
+
+# Miscellaneous caches
+.cache/
+.history/
+
+# Local npm package archives
+*.tgz
+
+# Temporary zip archives
+*.zip
