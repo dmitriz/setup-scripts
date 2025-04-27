@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Minimal reusable setup scripts and planning templates for clean, safe project initialization.",
   "scripts": {
-    "setup-hooks": "bash husky-setup.sh",
-    "test": "echo 'Test always passes'"
+    "install-git-hooks": "bash install-git-hooks.sh",
+    "test": "bash test-runner.sh"
   },
   "keywords": [
     "setup",
