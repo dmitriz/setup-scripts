@@ -1,93 +1,109 @@
-# Project Master File: Git Automation and Workflow
+# Git Automation and Workflow Master Plan
 
-## High-Level Instructions
+This document defines the high-level project goals, phased planning, idea management system, and clean automation guidelines for Git hook setup and project initialization.
 
-- Any new ideas must first be added to the **Ideas** section (below).
-- Ideas must be reviewed and evaluated before moving into the **Plan**.
-- Evaluation criteria for moving ideas into Plan:
-  - Does it solve a real pain point?
-  - Does it improve productivity, speed, reliability, or reduce complexity?
-  - Is the cost (in time/maintenance) justified by the benefit?
-- No implementation happens before clear documentation and motivation are written.
-- Documentation must include:
-  - Clear description of the use case/problem.
-  - Explanation of how the solution helps.
-  - (Optional) Example of usage or scenario if needed.
-- Always propose several solutions at different levels of complexity:
-  - Minimalistic version
-  - Moderate version
-  - Full feature-rich version
-- **Testing First**: design minimal verification tests before full implementation.
+---
 
-## Plan (Approved and Scheduled)
+## Table of Contents
 
-### Phase 1: Initialize Repository
+- [High-Level Instructions](#high-level-instructions)
+- [Plan Phases](#plan-phases)
+- [Ideas Backlog](#ideas-backlog)
+- [Quick Milestones](#quick-milestones)
+
+---
+
+# High-Level Instructions
+
+- Any new ideas should first be added to the **Ideas Backlog** section.
+- Ideas are evaluated based on real pain points, automation value, and clarity.
+- Accepted ideas are promoted into the main plan under a specific phase.
+- Every step must favor minimalism, automation, and verifiability.
+
+Documentation must include:
+- Clear description of the use case/problem.
+- Explanation of how the solution helps.
+- (Optional) Example of usage or scenario if needed.
+
+Always propose several solutions at different levels of complexity:
+- Minimalistic version.
+- Moderate version.
+- Full feature-rich version.
+
+**Testing First**: Design minimal verification tests before full implementation.
+
+---
+
+# Plan Phases
+
+## Phase 1: Initialize Repository
 
 - [x] Initialize Git repository locally.
 - [x] Prepare initial `README.md` with project goals and setup instructions.
-- [x] Set up standard `.gitignore`.
 - [x] Create basic project structure (folders, placeholder files).
 
-### Phase 2: Basic Hook Management Setup
+## Phase 2: Basic Hook Management Setup
 
-- [x] Create `templates/` directory for all templates (generic, not only hooks).
-- [ ] Write minimal `pre-commit` hook that blocks commits to `main` and `master`.
-- [ ] Create initial hook template file under `templates/`.
-- [ ] Write `install-git-hooks.sh` script:
-  - [ ] Detect `.git/` presence.
-  - [ ] Copy templates into `.git/hooks/`.
-  - [ ] Set executable permissions.
-  - [ ] Dynamic handling of templates.
+- [x] Create `templates/` directory for hook templates.
+- [x] Write minimal `pre-commit`, `pre-push`, and `commit-msg` hooks into `templates/`.
+- [x] Write `install-git-hooks.sh` script:
+  - [x] Detect `.git/` presence.
+  - [x] Copy templates into `.git/hooks/`.
+  - [x] Set executable permissions.
+- [x] Make `install-git-hooks.sh` idempotent.
+- [x] Implement graceful failure if not inside a Git repo.
 
-### Phase 3: Automation Integration
+## Phase 3: Automation Integration
 
-- [ ] Add a `prepare` script into `package.json`.
-- [ ] (Optional) Create a `Makefile` for hook installation.
-- [ ] Add clear bypass instructions in `README.md` (`--no-verify`) with security warnings and proper use cases.
+- [x] Add a `prepare` script into `package.json`:
+  ```json
+  "scripts": {
+    "prepare": "bash scripts/install-git-hooks.sh"
+  }
+  - [ ] Add automated detection of hook installation success:
+  - [ ] Verify copied files exist.
+  - [ ] Verify executable permissions.
 
-### Phase 4: Repository Clean State Validation
+## Phase 4: Repository Clean State Validation
 
-- [ ] Design and implement minimal verification tests first:
+- [ ] After running setup scripts:
   - [ ] Verify `.git/hooks/` contains correct executable hooks.
-  - [ ] Verify no unintended files (`git status` clean).
-  - [ ] Verify manual commit test:
-    - [ ] Block commit to `main`/`master`.
-    - [ ] Allow commit to feature branch.
+  - [ ] Verify no unintended files or broken folders.
+  - [ ] Verify no staged changes (`git status` clean).
+- [ ] Perform manual dry-run tests:
+  - [ ] Try committing on `main` branch → must be blocked.
+  - [ ] Try committing on feature branch → must succeed.
 
-### Phase 5: Version Control Commit
+## Phase 5: Version Control Commit
 
-- [ ] Create initial clean commit with working pre-commit hook.
-- [ ] Push clean `dev` branch and create pull request to `main`.
-- [ ] Finalize and merge minimal working setup.
+- [ ] Create initial clean commit on `main` branch.
+- [ ] Push `main` branch to GitHub.
+- [ ] Configure branch protection rules (block direct pushes to `main`).
+- [ ] Create and push first feature branch (e.g., `setup-hooks`, `automation-v1`).
 
-### Phase 6: First Pull Request Focus
+## Phase 6: Advanced Automation (Optional Enhancements)
 
-- [ ] Pre-commit hook must block commits on `main` and `master`.
-- [ ] Manual validation and early automation.
-- [ ] No unintended artifacts.
-- [ ] Clear and minimal implementation only.
+- [ ] Build a dry-run validation script.
+- [ ] Build an auto-hook-repair script (optional future).
+- [ ] Add `--quiet` mode for the installer script (for CI).
+- [ ] Dynamic hook detection and installation.
 
-### Phase 7: Advanced Automation (Optional Future Enhancements)
+---
 
-- [ ] Build a `validation.sh` script to check hook installation correctness.
-- [ ] Add `--quiet` mode for install script.
-- [ ] Build self-healing installer (optional).
-- [ ] Extend hooks (pre-push, commit-msg, post-merge).
+# Ideas Backlog
 
-## Ideas (Unapproved, Brainstorm)
+- Build lightweight CLI for hook management.
+- Explore dynamic templating for reusable scripts.
+- Investigate multi-repository hook management.
+- Automate README badge generation for hooks status.
 
-### Future Enhancements
+---
 
-- Build advanced dry-run validation framework.
-- Introduce templates for other purposes (CI templates, documentation templates, etc).
-- Explore automatic reinstallation of hooks after `git pull`.
-- Investigate dynamic configuration for hooks behavior.
-- Lightweight local test runner to validate hook scripts.
+# Quick Milestones
 
-## Quick Next Milestones
+- [ ] Finalize initial hook install and verification system.
+- [ ] Push minimal repository to GitHub.
+- [ ] Plan next phase: enforcement and automation hardening.
+- [ ] Validate project setup flow with test runner.
 
-- [ ] Write minimal pre-commit hook template.
-- [ ] Setup initial `install-git-hooks.sh` basic structure.
-- [ ] Create and commit minimal manual verification checklist.
-- [ ] Push clean feature branch to GitHub.
-- [ ] Create first Pull Request.
+---
