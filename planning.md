@@ -31,7 +31,7 @@ Always propose several solutions at different levels of complexity:
 - Full feature-rich version.
 
 **Testing First**: Design minimal verification tests before full implementation.
-
+- [ ] Write minimal `pre-commit` hook that blocks commits to protected branches (configurable, initially `main` and `master`).
 ---
 
 ## Plan Phases
