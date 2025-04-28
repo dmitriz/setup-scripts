@@ -48,9 +48,6 @@ Thumbs.db
 # Git conflict files
 *.orig
 
-# Husky system internal files
-.husky/_/
-
 # Test coverage (future-proof)
 coverage/
 
