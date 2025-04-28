@@ -90,7 +90,7 @@ Always propose several solutions at different levels of complexity:
 
 ---
 
-# Ideas Backlog
+## Ideas Backlog
 
 - Build lightweight CLI for hook management.
 - Explore dynamic templating for reusable scripts.
