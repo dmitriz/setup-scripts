@@ -99,7 +99,7 @@ Always propose several solutions at different levels of complexity:
 
 ---
 
-# Quick Milestones
+## Quick Milestones
 
 - [ ] Finalize initial hook install and verification system.
 - [ ] Push minimal repository to GitHub.
