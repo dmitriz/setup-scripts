@@ -34,7 +34,7 @@ Always propose several solutions at different levels of complexity:
 
 ---
 
-# Plan Phases
+## Plan Phases
 
 ## Phase 1: Initialize Repository
 
