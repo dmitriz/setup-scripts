@@ -22,6 +22,13 @@ const LABELS = [
   { name: 'status/needs-input', color: 'e99695', description: 'Requires input or feedback' }
 ];
 
+/**
+ * Loads the GitHub authentication token from a local secrets file.
+ *
+ * @returns {string} The GitHub token read from the secrets file.
+ *
+ * @throws {Error} If the secrets file does not exist or the token is missing.
+ */
 function loadToken() {
   if (!fs.existsSync(SECRETS_PATH)) {
     throw new Error(`Secrets file not found at ${SECRETS_PATH}`);
@@ -31,6 +38,18 @@ function loadToken() {
   return secrets.token;
 }
 
+/**
+ * Creates a GitHub issue label in the specified repository using the GitHub API.
+ *
+ * Resolves with a success message if the label is created, or a warning if the label already exists.
+ *
+ * @param {Object} label - An object containing the label's `name`, `color`, and `description`.
+ * @param {string} repo - The full repository name in the format `owner/repo`.
+ * @param {string} token - A valid GitHub authentication token.
+ * @returns {Promise<string>} A message indicating the result of the label creation.
+ *
+ * @throws {Error} If the API request fails with a status code other than 2xx or 422.
+ */
 async function createLabel(label, repo, token) {
   const data = JSON.stringify({
     name: label.name,
@@ -71,6 +90,11 @@ async function createLabel(label, repo, token) {
   });
 }
 
+/**
+ * Creates all predefined GitHub issue labels for the target repository.
+ *
+ * Loads the GitHub authentication token, then iterates through each label definition and attempts to create it in the specified repository. Logs the outcome of each label creation attempt to the console.
+ */
 async function main() {
   const repo = 'dmitriz/health-routines'; // Change this as needed
   const token = loadToken();
