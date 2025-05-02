@@ -4,7 +4,9 @@
   "description": "Minimal reusable setup scripts and planning templates for clean, safe project initialization.",
   "scripts": {
     "setup-hooks": "bash husky-setup.sh",
-    "test": "jest"
+    "test": "jest",
+    "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
+    "lint:md:fix": "markdownlint \"**/*.md\" --ignore node_modules --fix"
   },
   "keywords": [
     "setup",
@@ -19,6 +21,7 @@
     "axios": "^1.9.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "markdownlint-cli": "^0.44.0"
   }
 }

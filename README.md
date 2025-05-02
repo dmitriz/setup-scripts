@@ -53,6 +53,7 @@ git push --no-verify
 A utility to fetch and compile CodeRabbit AI review summaries into a consolidated markdown file.
 
 Features:
+
 - Fetches all reviews for a repository
 - Groups feedback by PR number
 - Outputs a well-formatted markdown summary
@@ -118,6 +119,7 @@ This script will:
 To export CodeRabbit AI review summaries for a GitHub repository:
 
 1. Create a `secrets/coderabbit.js` file with your API key:
+
 ```javascript
 module.exports = {
   apiKey: "your-coderabbit-api-key"
@@ -125,16 +127,19 @@ module.exports = {
 ```
 
 2. Run the script with your repository name:
+
 ```bash
 node coderabbit/fetch-reviews.js owner/repo
 ```
 
 3. Optionally filter by PR number:
+
 ```bash
 node coderabbit/fetch-reviews.js owner/repo 123
 ```
 
 4. You can specify the output mode (default is both):
+
 ```bash
 node coderabbit/fetch-reviews.js owner/repo [pr-number] individual   # Only individual PR files
 node coderabbit/fetch-reviews.js owner/repo [pr-number] consolidated # Only consolidated summary
@@ -142,6 +147,7 @@ node coderabbit/fetch-reviews.js owner/repo [pr-number] both         # Both outp
 ```
 
 By default, the script will generate:
+
 - A `summary.md` file in the `coderabbit` directory containing all reviews grouped by PR number
 - Individual files for each PR named `coderabbit-summary-{PR_NUMBER}.md`
 
