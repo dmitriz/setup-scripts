@@ -29,6 +29,17 @@ Protect `main` branch on GitHub at server level.
 - [x] Local hooks installed and verified.
 - [x] Local tests passing.
 - [ ] Set up GitHub Branch Protection Rules.
+
+  **Timeline**:  
+  - **Day 1**: Research GitHub branch protection options and document the required rules.  
+  - **Day 2**: Configure branch protection rules for the `main` branch on GitHub.  
+  - **Day 3**: Test the rules by attempting direct pushes and pull request merges.  
+
+  **Plan**:  
+  - Enable "Require pull request reviews before merging."  
+  - Set "Require status checks to pass before merging" (optional for now).  
+  - Block force pushes and deletions on the `main` branch.  
+  - Document the configuration steps in the project README.  
 - [ ] Require pull request to merge into `main`.
 - [ ] Optionally enforce status checks later (not urgent).
 - [ ] Update README to reflect that main is protected by GitHub rules.

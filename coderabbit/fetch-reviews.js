@@ -5,7 +5,13 @@
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
-const { apiKey } = require("../secrets/coderabbit");
+let coderabbitConfig;
+try {
+  coderabbitConfig = require("../secrets/coderabbit");
+} catch (error) {
+  console.error("❌ Error: secrets/coderabbit.js file not found. Please create it with your API key.");
+  process.exit(1);
+}
 
 // === Constants ===
 const API_URL = "https://api.coderabbit.ai/review-history"; // This may evolve

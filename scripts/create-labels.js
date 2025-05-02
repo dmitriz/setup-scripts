@@ -1,10 +1,38 @@
+/**
+ * Predefined GitHub issue labels organized by category.
+ *
+ * These labels are used to categorize and manage issues in a GitHub repository.
+ * Each label is defined with the following properties:
+ * - `name`: A string representing the label's name, prefixed by its category (e.g., "type/", "priority/", "status/").
+ * - `color`: A string representing the label's color in hexadecimal format (without the `#` prefix).
+ * - `description`: A string providing a brief explanation of the label's purpose.
+ *
+ * Categories:
+ * - **Type**: Labels that describe the nature of the issue (e.g., action, concept).
+ * - **Priority**: Labels that indicate the urgency or importance of the issue (e.g., now, next, later).
+ * - **Status**: Labels that reflect the current state of the issue (e.g., untriaged, today, done, needs-input).
+ *
+ * Example:
+ * ```javascript
+ * { name: 'type/action', color: '1d76db', description: 'Task or actionable item' }
+ * ```
+ *
+ * These labels help maintainers and contributors organize and prioritize issues effectively.
+ */
 // scripts/create-labels.js
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const SECRETS_PATH = path.resolve(__dirname, '../.secrets/github.json');
+require('dotenv').config();
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+if (!GITHUB_TOKEN) {
+  throw new Error('GitHub token not found in environment variables');
+}
+if (!/^gh[pous]_[A-Za-z0-9_]{36}$/.test(GITHUB_TOKEN)) {
+  throw new Error('Invalid GitHub token format');
+}
 const LABELS = [
   // Type
   { name: 'type/action',      color: '1d76db', description: 'Task or actionable item' },
@@ -80,7 +108,10 @@ async function createLabel(label, repo, token) {
         } else if (res.statusCode === 422) {
           resolve(`⚠ Already exists: ${label.name}`);
         } else {
-          reject(`Error for ${label.name}: ${res.statusCode} - ${body}`);
+          const error = new Error(`Error for ${label.name}: ${res.statusCode} - ${body}`);
+          error.statusCode = res.statusCode;
+          error.responseBody = body;
+          reject(error);
         }
       });
     });
@@ -109,4 +140,7 @@ async function main() {
   }
 }
 
-main();
+main().catch(error => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});

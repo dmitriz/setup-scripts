@@ -44,6 +44,7 @@ Fetch review summaries from CodeRabbit's API and export as human-readable markdo
 - [x] Create `coderabbit/fetch-review.js` script
 - [x] Validate API key and handle errors
 - [x] Fetch full review history and sort by PR
+- [x] Implement pagination handling for API responses
 - [x] Extract summary text and structure by PR
 - [x] Save result to `summary.md`
 - [x] Add minimal tests (output presence, API format)
