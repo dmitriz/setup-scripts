@@ -39,15 +39,15 @@ Fetch review summaries from CodeRabbit's API and export as human-readable markdo
 
 ### Tasks
 
-- [ ] Create `secrets/coderabbit.js` returning token object
-- [ ] Create `coderabbit/fetch-review.test.js` with unit tests
-- [ ] Create `coderabbit/fetch-review.js` script
-- [ ] Validate API key and handle errors
-- [ ] Fetch full review history and sort by PR
-- [ ] Extract summary text and structure by PR
-- [ ] Save result to `summary.md`
-- [ ] Add minimal tests (output presence, API format)
-- [ ] Document usage in `README.md`
+- [x] Create `secrets/coderabbit.js` returning token object
+- [x] Create `coderabbit/fetch-review.test.js` with unit tests
+- [x] Create `coderabbit/fetch-review.js` script
+- [x] Validate API key and handle errors
+- [x] Fetch full review history and sort by PR
+- [x] Extract summary text and structure by PR
+- [x] Save result to `summary.md`
+- [x] Add minimal tests (output presence, API format)
+- [x] Document usage in `README.md`
 
 ---
 

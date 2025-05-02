@@ -11,6 +11,7 @@ const { apiKey } = require("../secrets/coderabbit");
 const API_URL = "https://api.coderabbit.ai/review-history"; // This may evolve
 const OUTPUT_DIR = __dirname;
 const DEFAULT_FILENAME = pr => `coderabbit-summary-${pr}.md`;
+const SUMMARY_FILENAME = "summary.md";
 
 // === Utility: Save markdown ===
 function saveMarkdown(prNumber, content) {
@@ -20,17 +21,90 @@ function saveMarkdown(prNumber, content) {
   console.log(`✅ Saved summary to ${filename}`);
 }
 
+// === Utility: Save consolidated markdown ===
+function saveConsolidatedMarkdown(content) {
+  const fullPath = path.join(OUTPUT_DIR, SUMMARY_FILENAME);
+  fs.writeFileSync(fullPath, content, "utf8");
+  console.log(`✅ Saved consolidated summary to ${SUMMARY_FILENAME}`);
+}
+
+// === Format individual PR review into markdown ===
+function formatPRReview(review) {
+  const { pull_request_number, summary, created_at } = review;
+  return `# CodeRabbit Review Summary – PR #${pull_request_number}
+
+**Date:** ${created_at}
+
+---
+
+${summary || "_No summary available._"}
+`;
+}
+
+// === Format reviews into consolidated markdown ===
+function formatConsolidatedReviews(reviews) {
+  const timestamp = new Date().toISOString();
+  
+  let markdown = `# CodeRabbit Review Summaries\n\n`;
+  markdown += `**Generated:** ${timestamp}\n\n`;
+  
+  // Group reviews by PR
+  const prGroups = {};
+  
+  reviews.forEach(review => {
+    const { pull_request_number } = review;
+    if (!prGroups[pull_request_number]) {
+      prGroups[pull_request_number] = [];
+    }
+    prGroups[pull_request_number].push(review);
+  });
+  
+  // Generate markdown for each PR group
+  Object.keys(prGroups).sort((a, b) => b - a).forEach(prNumber => {
+    markdown += `## PR #${prNumber}\n\n`;
+    
+    // Sort reviews by date (newest first)
+    const prReviews = prGroups[prNumber].sort((a, b) => 
+      new Date(b.created_at) - new Date(a.created_at)
+    );
+    
+    prReviews.forEach(review => {
+      const { summary, created_at, affected_files } = review;
+      
+      markdown += `### Review from ${created_at}\n\n`;
+      markdown += `${summary || "_No summary available._"}\n\n`;
+      
+      // Include affected files if available
+      if (affected_files && affected_files.length > 0) {
+        markdown += `**Affected Files:**\n\n`;
+        affected_files.forEach(file => {
+          markdown += `- \`${file}\`\n`;
+        });
+        markdown += "\n";
+      }
+      
+      markdown += "---\n\n";
+    });
+  });
+  
+  return markdown;
+}
+
 // === Entry Point ===
-async function fetchReviews(repo, prFilter = null) {
-  if (!apiKey) {
+async function fetchReviews(repo, prFilter = null, options = { individual: true, consolidated: true }) {
+  // Check if apiKey exists and is not undefined
+  const coderabbitConfig = require("../secrets/coderabbit");
+  if (!coderabbitConfig.apiKey) {
     console.error("❌ No API key found in secrets/coderabbit.js");
     process.exit(1);
+    // This return is important for testing since Jest will catch the process.exit call
+    return;
   }
 
   try {
     const response = await axios.get(API_URL, {
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${coderabbitConfig.apiKey}`,
         "Content-Type": "application/json",
       },
       params: {
@@ -53,19 +127,22 @@ async function fetchReviews(repo, prFilter = null) {
       console.log(`ℹ️ No review found for PR #${prFilter}`);
       return;
     }
-
-    selected.forEach(review => {
-      const { pull_request_number, summary, created_at } = review;
-      const md = `# CodeRabbit Review Summary – PR #${pull_request_number}
-
-**Date:** ${created_at}
-
----
-
-${summary || "_No summary available._"}
-`;
-      saveMarkdown(pull_request_number, md);
-    });
+    
+    // Generate individual PR files (original behavior)
+    if (options.individual) {
+      selected.forEach(review => {
+        const { pull_request_number } = review;
+        const md = formatPRReview(review);
+        saveMarkdown(pull_request_number, md);
+      });
+    }
+    
+    // Generate consolidated summary file (new behavior)
+    if (options.consolidated) {
+      const markdownContent = formatConsolidatedReviews(selected);
+      saveConsolidatedMarkdown(markdownContent);
+    }
+    
   } catch (err) {
     console.error("❌ Failed to fetch review history:");
     console.error(err.message || err);
@@ -74,12 +151,19 @@ ${summary || "_No summary available._"}
 
 // === CLI Mode ===
 if (require.main === module) {
-  const [repo, pr] = process.argv.slice(2);
+  const [repo, pr, mode] = process.argv.slice(2);
   if (!repo) {
-    console.log("Usage: node fetchReviews.js <github-repo> [pr-number]");
+    console.log("Usage: node fetch-reviews.js <github-repo> [pr-number] [output-mode]");
+    console.log("Output modes: individual, consolidated, both (default: both)");
     process.exit(0);
   }
-  fetchReviews(repo, pr);
+  
+  const options = {
+    individual: mode === "individual" || mode === "both" || !mode,
+    consolidated: mode === "consolidated" || mode === "both" || !mode
+  };
+  
+  fetchReviews(repo, pr, options);
 }
 
 module.exports = { fetchReviews };
