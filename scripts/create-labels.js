@@ -22,8 +22,8 @@
 // scripts/create-labels.js
 
 const fs = require('fs');
-const path = require('path');
 const https = require('https');
+const winston = require('winston');
 
 require('dotenv').config();
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -33,6 +33,10 @@ if (!GITHUB_TOKEN) {
 if (!/^gh[pous]_[A-Za-z0-9_]{36}$/.test(GITHUB_TOKEN)) {
   throw new Error('Invalid GitHub token format');
 }
+
+// Define the path to secrets file
+const SECRETS_PATH = './secrets/github-token.json';
+
 const LABELS = [
   // Type
   { name: 'type/action',      color: '1d76db', description: 'Task or actionable item' },
@@ -66,6 +70,12 @@ function loadToken() {
   return secrets.token;
 }
 
+const HTTP_STATUS = {
+  OK_MIN: 200,
+  OK_MAX: 300,
+  UNPROCESSABLE_ENTITY: 422,
+};
+
 /**
  * Creates a GitHub issue label in the specified repository using the GitHub API.
  *
@@ -85,6 +95,12 @@ async function createLabel(label, repo, token) {
     description: label.description,
   });
 
+  const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [new winston.transports.Console()]
+  });
+
   const options = {
     hostname: 'api.github.com',
     path: `/repos/${repo}/labels`,
@@ -98,15 +114,19 @@ async function createLabel(label, repo, token) {
     }
   };
 
+  logger.info('HTTP request options prepared', { options });
+
   return new Promise((resolve, reject) => {
     const req = https.request(options, res => {
       let body = '';
       res.on('data', chunk => (body += chunk));
       res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(`✔ Created: ${label.name}`);
-        } else if (res.statusCode === 422) {
-          resolve(`⚠ Already exists: ${label.name}`);
+        if (res.statusCode >= HTTP_STATUS.OK_MIN && res.statusCode < HTTP_STATUS.OK_MAX) {
+          resolve(`✔ Created: ${LABELS.find(l => l.name === label.name)?.name || label.name}`);
+        } else if (res.statusCode === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+          resolve(`⚠ Already exists: ${LABELS.find(l => l.name === label.name)?.name || label.name}`);
+        } else if (res.statusCode === 403) {
+          reject(new Error(`Rate limit exceeded or forbidden: ${res.statusCode} - ${body}`));
         } else {
           const error = new Error(`Error for ${label.name}: ${res.statusCode} - ${body}`);
           error.statusCode = res.statusCode;
@@ -115,7 +135,11 @@ async function createLabel(label, repo, token) {
         }
       });
     });
-    req.on('error', reject);
+
+    req.on('error', error => {
+      reject(new Error(`Network error: ${error.message}`));
+    });
+
     req.write(data);
     req.end();
   });
@@ -127,12 +151,18 @@ async function createLabel(label, repo, token) {
  * Loads the GitHub authentication token, then iterates through each label definition and attempts to create it in the specified repository. Logs the outcome of each label creation attempt to the console.
  */
 async function main() {
-  const repo = 'dmitriz/health-routines'; // Change this as needed
-  const token = loadToken();
+  const repoArg = process.env.GITHUB_REPOSITORY || process.argv[2];
+  if (!repoArg) {
+    console.error('Usage: node create-labels.js <owner/repo> or set GITHUB_REPOSITORY environment variable');
+    process.exit(1);
+  }
+  
+  // Use GITHUB_TOKEN from env or load from secrets file
+  const token = GITHUB_TOKEN || loadToken();
 
   for (const label of LABELS) {
     try {
-      const result = await createLabel(label, repo, token);
+      const result = await createLabel(label, repoArg, token);
       console.log(result);
     } catch (error) {
       console.error(error);
