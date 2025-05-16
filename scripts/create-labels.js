@@ -109,9 +109,9 @@ async function createLabel(label, repo, token) {
     headers: {
       'Authorization': `Bearer ${token}`,
       'User-Agent': 'label-script',
-      'Accept': 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data),
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
+    'Content-Length': Buffer.byteLength(data),
     }
   };
 
@@ -139,6 +139,11 @@ async function createLabel(label, repo, token) {
 
     req.on('error', error => {
       reject(new Error(`Network error: ${error.message}`));
+    });
+
+    req.setTimeout(10000, () => {
+      req.abort();
+      reject(new Error('Request timed out after 10 seconds'));
     });
 
     req.write(data);
