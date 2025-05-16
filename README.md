@@ -50,14 +50,9 @@ git push --no-verify
 
 ### CodeRabbit Review Exporter
 
-A utility to fetch and compile CodeRabbit AI review summaries into a consolidated markdown file.
+#### Status: ON HOLD
 
-Features:
-
-- Fetches all reviews for a repository
-- Groups feedback by PR number
-- Outputs a well-formatted markdown summary
-- Includes timestamps and affected files
+**Reason:** This plan is currently on hold due to the availability of equivalent features in the CodeRabbit IDE extension.
 
 ---
 

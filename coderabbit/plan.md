@@ -1,4 +1,10 @@
+<!-- This plan is currently on hold due to the availability of equivalent features in the CodeRabbit IDE extension. -->
+
 # Plan: CodeRabbit Review Exporter
+
+## ⚠️ THIS PLAN IS ON HOLD ⚠️
+
+**Reason:** Equivalent features are now available in the CodeRabbit IDE extension.
 
 ## Goal
 
