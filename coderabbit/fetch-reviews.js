@@ -22,7 +22,15 @@ const SUMMARY_FILENAME = "summary.md";
 // === Utility: Save markdown ===
 function saveMarkdown(prNumber, content) {
   const filename = DEFAULT_FILENAME(prNumber);
+function saveMarkdown(prNumber, content) {
+  const filename = DEFAULT_FILENAME(prNumber);
   const fullPath = path.join(OUTPUT_DIR, filename);
+  
+  // Ensure the output directory exists
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+  
   fs.writeFileSync(fullPath, content, "utf8");
   console.log(`✅ Saved summary to ${filename}`);
 }
@@ -91,15 +99,13 @@ function formatConsolidatedReviews(reviews) {
       
       markdown += "---\n\n";
     });
-  });
-  
-  return markdown;
-}
-
-// === Entry Point ===
-async function fetchReviews(repo, prFilter = null, options = { individual: true, consolidated: true }) {
+  if (!coderabbitConfig.apiKey) {
+    console.error("❌ No API key found in secrets/coderabbit.js");
+    process.exit(1);
+    // This return is important for testing since Jest will catch the process.exit call
+    return;
+  }
   // Check if apiKey exists and is not undefined
-  const coderabbitConfig = require("../secrets/coderabbit");
   if (!coderabbitConfig.apiKey) {
     console.error("❌ No API key found in secrets/coderabbit.js");
     process.exit(1);
@@ -126,7 +132,7 @@ async function fetchReviews(repo, prFilter = null, options = { individual: true,
     }
 
     const selected = prFilter
-      ? reviews.filter(r => r.pull_request_number == prFilter)
+      ? reviews.filter(r => r.pull_request_number === Number(prFilter))
       : reviews;
 
     if (selected.length === 0) {

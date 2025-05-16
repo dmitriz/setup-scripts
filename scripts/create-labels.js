@@ -4,7 +4,7 @@
  * These labels are used to categorize and manage issues in a GitHub repository.
  * Each label is defined with the following properties:
  * - `name`: A string representing the label's name, prefixed by its category (e.g., "type/", "priority/", "status/").
- * - `color`: A string representing the label's color in hexadecimal format (without the `#` prefix).
+ const SECRETS_PATH = path.resolve(__dirname, '../secrets/github.json');
  * - `description`: A string providing a brief explanation of the label's purpose.
  *
  * Categories:
@@ -24,35 +24,39 @@
 const fs = require('fs');
 const https = require('https');
 const winston = require('winston');
+const LABELS = require('../config/github-labels.json');
 
 require('dotenv').config();
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-if (!GITHUB_TOKEN) {
-  throw new Error('GitHub token not found in environment variables');
-}
-if (!/^gh[pous]_[A-Za-z0-9_]{36}$/.test(GITHUB_TOKEN)) {
-  throw new Error('Invalid GitHub token format');
-}
 
 // Define the path to secrets file
 const SECRETS_PATH = './secrets/github-token.json';
 
-const LABELS = [
-  // Type
-  { name: 'type/action',      color: '1d76db', description: 'Task or actionable item' },
-  { name: 'type/concept',     color: '006b75', description: 'Concept or knowledge item' },
-  
-  // Priority
-  { name: 'priority/now',     color: 'b60205', description: 'Urgent or current priority' },
-  { name: 'priority/next',    color: 'fbca04', description: 'Near-term priority' },
-  { name: 'priority/later',   color: 'c2e0c6', description: 'Deferred or backlog' },
-
-  // Status
-  { name: 'status/untriaged', color: 'd4c5f9', description: 'Needs triage' },
-  { name: 'status/today',     color: '0052cc', description: 'Active today' },
-  { name: 'status/done',      color: 'd1d5da', description: 'Completed or resolved' },
-  { name: 'status/needs-input', color: 'e99695', description: 'Requires input or feedback' }
-];
+/**
+ * Predefined GitHub issue labels organized by category (e.g., Type, Priority, Status).
+ * These labels are used to standardize issue categorization and streamline project workflows.
+ *
+ * Each label object must include:
+ * - name: {string} The label name, typically prefixed by its category (e.g., 'type/action').
+ * - color: {string} A hex color code (without the '#' symbol) for the label's background.
+ * - description: {string} A brief explanation of the label's purpose.
+ *
+ * @type {Array<{
+ *   name: string,
+ *   color: string,
+ *   description: string
+ * }>}
+ */
+// Load labels from external JSON configuration
+function validateToken(token) {
+  if (!token) {
+    throw new Error('GitHub token not found in environment variables');
+  }
+  const tokenRegex = /^gh[pous]_[A-Za-z0-9_]{36}$/;
+  if (!tokenRegex.test(token)) {
+    throw new Error('Invalid GitHub token format');
+  }
+}
 
 /**
  * Loads the GitHub authentication token from a local secrets file.
@@ -62,12 +66,9 @@ const LABELS = [
  * @throws {Error} If the secrets file does not exist or the token is missing.
  */
 function loadToken() {
-  if (!fs.existsSync(SECRETS_PATH)) {
-    throw new Error(`Secrets file not found at ${SECRETS_PATH}`);
-  }
-  const secrets = JSON.parse(fs.readFileSync(SECRETS_PATH));
-  if (!secrets.token) throw new Error('GitHub token not found in secrets file');
-  return secrets.token;
+  const token = process.env.GITHUB_TOKEN;
+  validateToken(token);
+  return token;
 }
 
 const HTTP_STATUS = {

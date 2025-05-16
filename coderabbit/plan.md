@@ -56,7 +56,13 @@ Fetch review summaries from CodeRabbit's API and export as human-readable markdo
 
 - CodeRabbit currently exposes summaries, not inline comments.
 - Full review history is available; filter on client side.
-- No rate limit officially documented; assume pagination if needed.
+- API version: v1 (all endpoints under `/api/v1/`)
+- Rate limits (per [docs](https://docs.coderabbit.ai/faq)):
+  - 200 files/hour per developer/repo
+  - 100 files per PR
+  - 4 back-to-back reviews, then 3 reviews/hour (summary only)
+  - 25 back-to-back messages, then 50 messages/hour
+- Pagination: use `page_size` and `next_cursor` parameters for listing reviews and comments.
 - All output is human-readable markdown; may later adapt for JSON.
 
 ---
