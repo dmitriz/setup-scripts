@@ -22,8 +22,6 @@ const SUMMARY_FILENAME = "summary.md";
 // === Utility: Save markdown ===
 function saveMarkdown(prNumber, content) {
   const filename = DEFAULT_FILENAME(prNumber);
-function saveMarkdown(prNumber, content) {
-  const filename = DEFAULT_FILENAME(prNumber);
   const fullPath = path.join(OUTPUT_DIR, filename);
   
   // Ensure the output directory exists
@@ -99,66 +97,9 @@ function formatConsolidatedReviews(reviews) {
       
       markdown += "---\n\n";
     });
-  if (!coderabbitConfig.apiKey) {
-    console.error("❌ No API key found in secrets/coderabbit.js");
-    process.exit(1);
-    // This return is important for testing since Jest will catch the process.exit call
-    return;
-  }
-  // Check if apiKey exists and is not undefined
-  if (!coderabbitConfig.apiKey) {
-    console.error("❌ No API key found in secrets/coderabbit.js");
-    process.exit(1);
-    // This return is important for testing since Jest will catch the process.exit call
-    return;
-  }
+  });
 
-  try {
-    const response = await axios.get(API_URL, {
-      headers: {
-        Authorization: `Bearer ${coderabbitConfig.apiKey}`,
-        "Content-Type": "application/json",
-      },
-      params: {
-        repository: repo,
-      },
-    });
-
-    const reviews = response.data.reviews || [];
-
-    if (reviews.length === 0) {
-      console.log("ℹ️ No reviews found for this repository.");
-      return;
-    }
-
-    const selected = prFilter
-      ? reviews.filter(r => r.pull_request_number === Number(prFilter))
-      : reviews;
-
-    if (selected.length === 0) {
-      console.log(`ℹ️ No review found for PR #${prFilter}`);
-      return;
-    }
-    
-    // Generate individual PR files (original behavior)
-    if (options.individual) {
-      selected.forEach(review => {
-        const { pull_request_number } = review;
-        const md = formatPRReview(review);
-        saveMarkdown(pull_request_number, md);
-      });
-    }
-    
-    // Generate consolidated summary file (new behavior)
-    if (options.consolidated) {
-      const markdownContent = formatConsolidatedReviews(selected);
-      saveConsolidatedMarkdown(markdownContent);
-    }
-    
-  } catch (err) {
-    console.error("❌ Failed to fetch review history:");
-    console.error(err.message || err);
-  }
+  return markdown;
 }
 
 // === CLI Mode ===
@@ -179,3 +120,4 @@ if (require.main === module) {
 }
 
 module.exports = { fetchReviews };
+
