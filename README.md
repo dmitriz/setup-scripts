@@ -13,10 +13,12 @@ Minimal reusable setup scripts and planning templates for clean, safe project in
 - [Purpose](#purpose)
 - [Included](#included)
   - [Git Hooks Setup](#git-hooks-setup)
+  - [CodeRabbit Review Exporter](#coderabbit-review-exporter)
   - [Templates](#templates)
 - [Usage](#usage)
   - [Use Git Hooks (automated)](#1-use-git-hooks-automated)
-  - [Create Project Planning Template](#2-create-project-planning-template)
+  - [Export CodeRabbit Reviews](#2-export-coderabbit-reviews)
+  - [Create Project Planning Template](#3-create-project-planning-template)
 - [Directory Structure](#directory-structure)
 - [License](#license)
 - [Philosophy](#philosophy)
@@ -45,6 +47,12 @@ If you need to bypass hooks manually (e.g., emergency commits, migrations), you 
 git commit --no-verify
 git push --no-verify
 ```
+
+### CodeRabbit Review Exporter
+
+#### Status: ON HOLD
+
+**Reason:** This plan is currently on hold due to the availability of equivalent features in the CodeRabbit IDE extension.
 
 ---
 
@@ -79,7 +87,7 @@ To set up Git hooks, follow these steps:
 chmod +x git/hooks/*
 ```
 
-1. Configure Git to use the hooks:
+4. Configure Git to use the hooks:
 
 ```bash
 git config core.hooksPath git/hooks
@@ -101,7 +109,46 @@ This script will:
 
 ---
 
-### 2. Create Project Planning Template
+### 2. Export CodeRabbit Reviews
+
+To export CodeRabbit AI review summaries for a GitHub repository:
+
+1. Create a `secrets/coderabbit.js` file with your API key:
+
+```javascript
+module.exports = {
+  apiKey: "your-coderabbit-api-key"
+};
+```
+
+2. Run the script with your repository name:
+
+```bash
+node coderabbit/fetch-reviews.js owner/repo
+```
+
+3. Optionally filter by PR number:
+
+```bash
+node coderabbit/fetch-reviews.js owner/repo 123
+```
+
+4. You can specify the output mode (default is both):
+
+```bash
+node coderabbit/fetch-reviews.js owner/repo [pr-number] individual   # Only individual PR files
+node coderabbit/fetch-reviews.js owner/repo [pr-number] consolidated # Only consolidated summary
+node coderabbit/fetch-reviews.js owner/repo [pr-number] both         # Both output types
+```
+
+By default, the script will generate:
+
+- A `summary.md` file in the `coderabbit` directory containing all reviews grouped by PR number
+- Individual files for each PR named `coderabbit-summary-{PR_NUMBER}.md`
+
+---
+
+### 3. Create Project Planning Template
 
 ```bash
 cp templates/planning-template.md planning.md
@@ -123,6 +170,12 @@ setup-scripts/
 ├── hook-setup.sh
 ├── .gitignore
 ├── README.md
+├── coderabbit/
+│   ├── fetch-reviews.js
+│   ├── fetch-review.test.js
+│   └── plan.md
+├── secrets/
+│   └── coderabbit.js
 ├── package.json
 ```
 
