@@ -21,7 +21,7 @@
     "axios": "^1.9.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
+    "jest": "^30.0.0",
     "markdownlint-cli": "^0.44.0"
   }
 }
